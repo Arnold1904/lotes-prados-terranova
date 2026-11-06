@@ -1,16 +1,35 @@
 {
-  "name": "lotes-prados-terranova",
+  "name": "aurum-residences",
+  "private": true,
   "version": "1.0.0",
-  "description": "Plataforma Web Interactiva Geoespacial, Render 3D y Contable para Prados de Terranova (38 Lotes de 20x30m = 600m2)",
-  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "init-db": "node database/init-db.js"
+    "assets": "node scripts/fetch-assets.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "mysql2": "^3.11.3"
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "@react-three/postprocessing": "^3.2.2",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "gsap": "^3.15.0",
+    "leaflet": "^1.9.4",
+    "maath": "^0.10.8",
+    "mysql2": "^3.24.6",
+    "postprocessing": "^6.39.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "^0.186.1",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@gltf-transform/cli": "^4.5.1",
+    "@vitejs/plugin-react": "^6.1.2",
+    "playwright-core": "^1.64.1",
+    "vite": "^8.3.5"
   }
 }
