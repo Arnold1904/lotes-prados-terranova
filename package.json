@@ -1,0 +1,16 @@
+{
+  "name": "lotes-prados-terranova",
+  "version": "1.0.0",
+  "description": "Plataforma Web Interactiva Geoespacial, Render 3D y Contable para Prados de Terranova (38 Lotes de 20x30m = 600m2)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "init-db": "node database/init-db.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "mysql2": "^3.11.3"
+  }
+}

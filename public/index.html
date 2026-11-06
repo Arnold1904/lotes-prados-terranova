@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prados de Terranova | 38 Lotes Campestres de 600 m² (20×30m) · SIG · Render 3D · Contabilidad</title>
+
+  <!-- Google Fonts: Cormorant Garamond + Plus Jakarta Sans + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS (Geospatial Viewer) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Main Design System Styles -->
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. LANDING PAGE INTERACTIVA CON ANIME.JS (PÚBLICA / COMERCIAL)
+       ======================================================================== -->
+  <div id="landing-page-view" class="landing-wrapper">
+    <header class="landing-nav">
+      <div class="brand-identity">
+        <div class="brand-crest">PT</div>
+        <div>
+          <span class="brand-title">Prados de Terranova</span>
+          <span class="brand-subtitle">Parcelación Campestre · 38 Lotes de 600 m²</span>
+        </div>
+      </div>
+
+      <nav class="landing-nav-links">
+        <a href="#hero-architectural">Proyecto</a>
+        <a href="#interactive-38-lots">Loteo Interactivo (38 Lotes)</a>
+        <a href="#lot-600m2-specs">Arquitectura 20×30m</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="live-pill">
+          <span class="live-dot"></span>
+          <span id="landing-live-counter">Cargando 38 Lotes MySQL...</span>
+        </div>
+        <button id="btn-open-login" class="btn btn-gold">
+          <span>🔐 Acceso Sistema & Contabilidad</span>
+        </button>
+        <button id="btn-return-dashboard" class="btn btn-emerald hidden">
+          <span>📊 Ir al Panel Administrativo</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO SECTION CON PLANO SVG ANIMADO POR ANIME.JS -->
+    <section id="hero-architectural" class="hero-section">
+      <div class="hero-copy-col">
+        <div class="hero-eyebrow">
+          <span>✦ Loteo Exclusivo · 38 Parcelas de 20m × 30m = 600 m²</span>
+        </div>
+        <h1 class="hero-title">
+          Arquitectura campestre en armonía con la <span>tierra y la precisión</span>.
+        </h1>
+        <p class="hero-description">
+          Descubre <strong>Prados de Terranova</strong>: una reserva privada de <strong>38 lotes independientes de 600 m² (20m de frente × 30m de fondo)</strong> con redes subterráneas, visualización geoespacial satelital, personalización de tu casa en <strong>Render 3D</strong> y financiación directa.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#interactive-38-lots" class="btn btn-gold" id="btn-hero-explore">
+            <span>Explorar los 38 Lotes en Vivo (Anime.js)</span>
+          </a>
+          <button class="btn btn-outline-light" id="btn-hero-login-3d">
+            <span>Abrir Estudio Render 3D & SIG Satelital</span>
+          </button>
+        </div>
+
+        <div class="hero-metrics-strip">
+          <div class="hero-metric-card">
+            <span class="hero-metric-value" id="anime-counter-lots">0</span>
+            <span class="hero-metric-label">Lotes Exclusivos</span>
+          </div>
+          <div class="hero-metric-card">
+            <span class="hero-metric-value"><span id="anime-counter-area">0</span> m²</span>
+            <span class="hero-metric-label">Área por Lote (20×30m)</span>
+          </div>
+          <div class="hero-metric-card">
+            <span class="hero-metric-value" id="anime-counter-available">0</span>
+            <span class="hero-metric-label">Lotes Disponibles Hoy</span>
+          </div>
+          <div class="hero-metric-card">
+            <span class="hero-metric-value"><span id="anime-counter-total-area">0</span> m²</span>
+            <span class="hero-metric-label">Área Loteada Total</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANO ARQUITECTÓNICO 20x30m TRAZADO CON ANIME.JS -->
+      <div class="hero-blueprint-card">
+        <div class="blueprint-header">
+          <div>
+            <strong style="font-size: 0.95rem;">Plano Tipo Lote Campestre + Villa 3D</strong>
+            <div class="blueprint-tag">ESCALA REAL: FRENTE 20.00M × FONDO 30.00M = 600.00 M²</div>
+          </div>
+          <button id="btn-replay-blueprint" class="btn btn-outline-light btn-sm">
+            ↻ Animar Trazado CAD
+          </button>
+        </div>
+
+        <div class="blueprint-svg-container">
+          <svg id="architectural-blueprint-svg" class="blueprint-svg" viewBox="0 0 420 310" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Cotas Exteriores 20m x 30m -->
+            <line class="bp-line" x1="65" y1="22" x2="355" y2="22" stroke="#F0A854" stroke-width="1.5" />
+            <text x="210" y="15" fill="#F0A854" font-family="JetBrains Mono" font-size="11" text-anchor="middle">FRENTE VIAL: 20.00 METROS</text>
+
+            <line class="bp-line" x1="378" y1="35" x2="378" y2="275" stroke="#F0A854" stroke-width="1.5" />
+            <text x="392" y="160" fill="#F0A854" font-family="JetBrains Mono" font-size="11" text-anchor="middle" transform="rotate(90, 392, 160)">FONDO: 30.00 METROS (600 m²)</text>
+
+            <!-- Perímetro del Lote 20x30m -->
+            <rect class="bp-line" x="65" y="35" width="290" height="240" rx="4" stroke="#10B981" stroke-width="2.5" fill="rgba(16, 185, 129, 0.05)" />
+
+            <!-- Retiro Normativo Punteado -->
+            <rect class="bp-line" x="85" y="55" width="250" height="200" stroke="#6EE7B7" stroke-width="1" stroke-dasharray="5 5" />
+
+            <!-- Huella Arquitectónica Casa Campestre -->
+            <path class="bp-line" d="M105 75 H255 V165 H195 V195 H105 Z" stroke="#FFFFFF" stroke-width="2.2" fill="rgba(255,255,255,0.06)" />
+            <line class="bp-line" x1="105" y1="120" x2="255" y2="120" stroke="#B5C7BE" stroke-width="1.2" />
+            <line class="bp-line" x1="165" y1="75" x2="165" y2="165" stroke="#B5C7BE" stroke-width="1.2" />
+
+            <!-- Piscina Infinita & Deck -->
+            <rect class="bp-line" x="212" y="178" width="105" height="48" rx="4" stroke="#38BDF8" stroke-width="2" fill="rgba(56, 189, 248, 0.14)" />
+            <line class="bp-line" x1="220" y1="190" x2="308" y2="190" stroke="#7DD3FC" stroke-width="1" />
+            <line class="bp-line" x1="220" y1="205" x2="308" y2="205" stroke="#7DD3FC" stroke-width="1" />
+
+            <!-- Pérgola & Terraza Social -->
+            <rect class="bp-line" x="265" y="80" width="52" height="75" stroke="#F0A854" stroke-width="1.6" fill="rgba(217, 130, 43, 0.1)" />
+            <line class="bp-line" x1="265" y1="95" x2="317" y2="95" stroke="#F0A854" stroke-width="1" />
+            <line class="bp-line" x1="265" y1="110" x2="317" y2="110" stroke="#F0A854" stroke-width="1" />
+            <line class="bp-line" x1="265" y1="125" x2="317" y2="125" stroke="#F0A854" stroke-width="1" />
+            <line class="bp-line" x1="265" y1="140" x2="317" y2="140" stroke="#F0A854" stroke-width="1" />
+
+            <!-- Acceso Vehicular / Garaje Doble -->
+            <path class="bp-line" d="M110 275 V210 H175 V275" stroke="#94A3B8" stroke-width="1.5" />
+
+            <!-- Árboles Perimetrales -->
+            <circle class="bp-node" cx="85" cy="245" r="10" stroke="#10B981" stroke-width="1.5" fill="rgba(16,185,129,0.25)" />
+            <circle class="bp-node" cx="330" cy="245" r="12" stroke="#10B981" stroke-width="1.5" fill="rgba(16,185,129,0.25)" />
+            <circle class="bp-node" cx="85" cy="58" r="9" stroke="#10B981" stroke-width="1.5" fill="rgba(16,185,129,0.25)" />
+
+            <!-- Etiquetas Internas -->
+            <text x="150" y="102" fill="#FFFFFF" font-family="Plus Jakarta Sans" font-size="9" font-weight="600">VILLA CAMPESTRE 3D</text>
+            <text x="264" y="206" fill="#7DD3FC" font-family="JetBrains Mono" font-size="9" text-anchor="middle">PISCINA & SOLÁRIUM</text>
+            <text x="210" y="294" fill="#6EE7B7" font-family="JetBrains Mono" font-size="10" text-anchor="middle">ACCESO VÍA INTERNA ADOQUINADA (8.00m)</text>
+          </svg>
+        </div>
+
+        <div class="blueprint-footer">
+          <span>Índice de Ocupación Libre: <strong>70% Jardines & Zonas Verdes</strong></span>
+          <span class="mono" style="color: var(--gold-light);">600.00 m² Escriturables</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN INTERACTIVA DE LOS 38 LOTES CON ANIME.JS STAGGER -->
+    <section id="interactive-38-lots" class="landing-section">
+      <div class="section-header">
+        <div>
+          <span class="hero-eyebrow">✦ Masterplan Interactivo impulsado por Anime.js + MySQL</span>
+          <h2 class="section-title">Mosaico en Tiempo Real de los 38 Lotes (600 m²)</h2>
+          <p class="section-subtitle">
+            Haz clic sobre cualquier lote para disparar una onda elástica desde su epicentro, consultar su disponibilidad en la base de datos MySQL y calcular tu plan de pagos con o sin construcción de casa 3D.
+          </p>
+        </div>
+        <button id="btn-trigger-wave" class="btn btn-outline-light">
+          ✨ Disparar Onda Anime.js en los 38 Lotes
+        </button>
+      </div>
+
+      <div class="anime-matrix-layout">
+        <!-- Tablero de 38 Lotes -->
+        <div class="matrix-board">
+          <div class="matrix-toolbar">
+            <div class="filter-pills" id="landing-filter-pills">
+              <button class="filter-pill active" data-filter="todos">Todos (38 Lotes)</button>
+              <button class="filter-pill" data-filter="disponible">Disponibles</button>
+              <button class="filter-pill" data-filter="reservado">Reservados</button>
+              <button class="filter-pill" data-filter="vendido">Vendidos</button>
+              <button class="filter-pill" data-filter="Manzana A">Manzana A</button>
+              <button class="filter-pill" data-filter="Manzana B">Manzana B</button>
+              <button class="filter-pill" data-filter="Manzana C">Manzana C</button>
+              <button class="filter-pill" data-filter="Manzana D">Manzana D</button>
+            </div>
+            <span class="mono" style="font-size: 0.78rem; color: var(--text-sage);">Escala: 20m × 30m c/u</span>
+          </div>
+
+          <div id="landing-lots-grid" class="lots-stagger-grid">
+            <!-- Renderizado dinámicamente desde MySQL y animado con Anime.js -->
+          </div>
+
+          <!-- Barra de Distribución de los 600 m² -->
+          <div id="lot-600m2-specs" class="area-breakdown-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size: 0.92rem;">Distribución Arquitectónica del Lote Seleccionado (20m × 30m = 600 m²)</strong>
+              <span class="mono" id="breakdown-model-label" style="color: var(--gold-light); font-size:0.82rem;">Villa Terranova (180 m²)</span>
+            </div>
+            <div class="area-bar-track">
+              <div id="bar-seg-house" class="area-bar-segment" style="width: 30%; background: var(--gold-primary);" title="Huella Casa 3D"></div>
+              <div id="bar-seg-pool" class="area-bar-segment" style="width: 12%; background: #38bdf8;" title="Piscina, Deck & Pérgola"></div>
+              <div id="bar-seg-garden" class="area-bar-segment" style="width: 58%; background: #10b981;" title="Jardines, Huerta y Retiros Verdes"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-sage); flex-wrap:wrap; gap:0.5rem;">
+              <span>🟨 Vivienda & Terraza: <strong id="lbl-m2-house" class="mono">180 m²</strong></span>
+              <span>🟦 Piscina & Deck Solar: <strong id="lbl-m2-pool" class="mono">72 m²</strong></span>
+              <span>🟩 Reserva Paisajística Privada: <strong id="lbl-m2-garden" class="mono">348 m²</strong></span>
+              <span>📐 Total Lote: <strong class="mono" style="color:#fff;">600.00 m²</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ficha Interactiva / Cotizador del Lote Seleccionado -->
+        <aside class="lot-spotlight-card" id="landing-spotlight-card">
+          <div class="spotlight-badge-row">
+            <span class="mono" id="spot-codigo" style="font-size: 0.9rem; color: var(--gold-light);">MA-L02 · Manzana A</span>
+            <span id="spot-estado-badge" class="status-badge disponible">DISPONIBLE</span>
+          </div>
+
+          <h3 id="spot-titulo" class="serif" style="font-size: 1.9rem;">Lote Campestre #02</h3>
+          <p id="spot-desc" style="font-size: 0.85rem; color: var(--text-sage); margin-top: 0.3rem;">
+            Lote independiente de 20.00m de frente × 30.00m de fondo con acometidas subterráneas.
+          </p>
+
+          <div class="spotlight-price" id="spot-precio">$150.000.000</div>
+
+          <div class="spotlight-specs-grid">
+            <div class="spec-box">
+              <small>Dimensiones Exactas</small>
+              <strong id="spot-dimensiones">20.00m × 30.00m</strong>
+            </div>
+            <div class="spec-box">
+              <small>Área Escriturable</small>
+              <strong id="spot-area">600.00 m²</strong>
+            </div>
+            <div class="spec-box">
+              <small>Valor por m²</small>
+              <strong id="spot-precio-m2">$250.000 /m²</strong>
+            </div>
+            <div class="spec-box">
+              <small>Coordenadas GPS</small>
+              <strong id="spot-coords">4.8624, -74.0583</strong>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-dark); padding-top: 1rem; margin-bottom: 1.2rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.4rem;">
+              <span style="color:var(--text-sage);">Cuota Inicial Estimada (30%):</span>
+              <strong class="mono" id="spot-cuota-inicial" style="color:var(--text-ivory);">$45.000.000</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
+              <span style="color:var(--text-sage);">24 Cuotas Mensuales Directas:</span>
+              <strong class="mono" id="spot-cuota-mensual" style="color:#6ee7b7;">$4.375.000 /mes</strong>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:0.65rem;">
+            <button id="btn-spot-open-3d" class="btn btn-gold" style="width:100%;">
+              <span>🏠 Ver Render 3D de Casa en este Lote (20×30m)</span>
+            </button>
+            <button id="btn-spot-open-map" class="btn btn-outline-light" style="width:100%;">
+              <span>🛰️ Ubicar en Mapa Satelital Geoespacial</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========================================================================
+       2. MODAL DE LOGIN INTERACTIVO (CONECTADO A MYSQL + ANIME.JS)
+       ======================================================================== -->
+  <div id="login-modal-backdrop" class="modal-backdrop hidden">
+    <div id="login-modal-card" class="login-modal-card">
+      <button id="btn-close-login" class="modal-close-btn" title="Cerrar">✕</button>
+
+      <div class="brand-identity" style="margin-bottom: 1.35rem;">
+        <div class="brand-crest">PT</div>
+        <div>
+          <span class="brand-title">Acceso Corporativo</span>
+          <span class="brand-subtitle">MySQL Localhost:3306 · Prados de Terranova</span>
+        </div>
+      </div>
+
+      <div class="demo-credentials-box">
+        <strong style="color: var(--gold-light); display:block;">Credenciales de Acceso (MySQL):</strong>
+        <div class="demo-chip-row">
+          <button type="button" class="demo-chip" data-user="admin" data-pass="admin123">Usuario: admin / Contraseña: admin123</button>
+        </div>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-identifier">Usuario o Correo Electrónico</label>
+          <input type="text" id="login-identifier" class="form-control" value="admin" placeholder="admin o admin@terranova.com" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" class="form-control" value="admin123" placeholder="••••••••" required />
+        </div>
+        <div id="login-error-msg" class="hidden" style="color: #fb7185; font-size: 0.82rem; margin-bottom: 0.85rem;"></div>
+
+        <button type="submit" class="btn btn-gold" style="width: 100%; margin-top: 0.5rem;">
+          <span>Ingresar al Sistema Contable, SIG & Render 3D</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       3. PANEL ADMINISTRATIVO, GEOESPACIAL, RENDER 3D Y CONTABLE (SPA)
+       ======================================================================== -->
+  <div id="admin-workspace" class="admin-workspace hidden">
+    <!-- SIDEBAR DE NAVEGACIÓN -->
+    <aside class="admin-sidebar">
+      <div>
+        <div class="brand-identity">
+          <div class="brand-crest">PT</div>
+          <div>
+            <span class="brand-title">Prados de Terranova</span>
+            <span class="brand-subtitle">ERP · SIG · Estudio 3D</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav" id="admin-sidebar-nav">
+          <button class="sidebar-btn active" data-view="view-dashboard">
+            <span>📊</span> <span>Dashboard & Finanzas</span>
+          </button>
+          <button class="sidebar-btn" data-view="view-geospatial">
+            <span>🛰️</span> <span>Mapa Geoespacial (38 Lotes)</span>
+          </button>
+          <button class="sidebar-btn" data-view="view-studio-3d">
+            <span>🏠</span> <span>Estudio Render 3D (20×30m)</span>
+          </button>
+          <button class="sidebar-btn" data-view="view-lots-registry">
+            <span>📐</span> <span>Registro de los 38 Lotes</span>
+          </button>
+          <button class="sidebar-btn" data-view="view-accounting">
+            <span>💰</span> <span>Contabilidad, Ventas & Abonos</span>
+          </button>
+          <button class="sidebar-btn" data-view="view-clients">
+            <span>👥</span> <span>Clientes & Propietarios</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="mysql-status-card">
+          <div style="font-weight:700; margin-bottom:0.2rem;">🟢 MySQL Conectado (.env)</div>
+          <div class="mono" style="font-size:0.68rem;">127.0.0.1:3306 · BD: prados_terranova</div>
+          <div class="mono" style="font-size:0.68rem;">38 Lotes × 600 m² (20m × 30m)</div>
+        </div>
+
+        <div style="display:flex; gap:0.5rem;">
+          <button id="btn-back-to-landing" class="btn btn-outline-light btn-sm" style="flex:1;">
+            🌐 Ver Landing
+          </button>
+          <button id="btn-logout" class="btn btn-outline-light btn-sm" style="color:#fda4af;">
+            Salir
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="admin-main">
+      <!-- TOPBAR -->
+      <header class="admin-topbar">
+        <div>
+          <h2 id="topbar-view-title" class="serif" style="font-size: 1.55rem; color: var(--text-ink);">
+            Dashboard Ejecutivo & Balance de Loteo
+          </h2>
+          <p id="topbar-view-subtitle" style="font-size: 0.8rem; color: var(--text-muted-light);">
+            Control integral de los 38 lotes campestres de 20m × 30m (600 m²), cartera y flujo de caja en tiempo real.
+          </p>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+          <button id="btn-quick-new-sale" class="btn btn-gold btn-sm">
+            + Adjudicar / Vender Lote
+          </button>
+          <button id="btn-quick-new-abono" class="btn btn-emerald btn-sm">
+            + Registrar Abono / Cuota
+          </button>
+          <button id="btn-quick-new-accounting" class="btn btn-outline-dark btn-sm">
+            + Asiento Contable (Ingreso/Gasto)
+          </button>
+          <div style="padding-left:0.75rem; border-left:1px solid var(--border-light); font-size:0.8rem;">
+            <strong id="logged-user-name">Administrador</strong>
+            <span id="logged-user-role" style="display:block; font-size:0.7rem; color:var(--text-muted-light);">Administración General</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="admin-view-container">
+
+        <!-- ================================================================
+             VISTA 1: DASHBOARD EJECUTIVO & CONTABLE
+             ================================================================ -->
+        <section id="view-dashboard" class="admin-view">
+          <div class="kpi-grid" id="dashboard-kpi-grid">
+            <!-- Renderizado por app.js -->
+          </div>
+
+          <div class="form-grid-2">
+            <!-- Estado por Manzana -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3 class="panel-title">Ocupación y Valorización por Manzana (38 Lotes de 600 m²)</h3>
+                <span class="mono" style="font-size:0.76rem; color:var(--text-muted-light);">20.00m × 30.00m c/u</span>
+              </div>
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Manzana</th>
+                      <th>Total Lotes</th>
+                      <th>Disponibles</th>
+                      <th>Reservados</th>
+                      <th>Vendidos</th>
+                      <th>Valor Inventario</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-dashboard-manzanas"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Próximos Vencimientos de Cartera -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3 class="panel-title">Próximos Recaudos de Cartera Financiada</h3>
+                <button class="btn btn-emerald btn-sm" onclick="window.app.openNewAbonoModal()">Registrar Pago</button>
+              </div>
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Lote</th>
+                      <th>Cliente</th>
+                      <th>Próx. Pago</th>
+                      <th>Cuota Mensual</th>
+                      <th>Saldo Pendiente</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-dashboard-cobros"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Últimos Movimientos Contables -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title">Últimos Asientos en el Libro Contable (MySQL)</h3>
+              <button class="btn btn-outline-dark btn-sm" onclick="window.app.switchAdminView('view-accounting')">
+                Ver Libro Mayor Completo →
+              </button>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Asiento</th>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Categoría</th>
+                    <th>Lote</th>
+                    <th>Tercero</th>
+                    <th>Concepto</th>
+                    <th>Monto</th>
+                  </tr>
+                </thead>
+                <tbody id="table-dashboard-movimientos"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA 2: VISOR GEOESPACIAL SATELITAL DE LOS 38 LOTES
+             ================================================================ -->
+        <section id="view-geospatial" class="admin-view hidden">
+          <div class="geospatial-layout">
+            <div class="map-frame-wrapper">
+              <!-- Controles Flotantes Superiores -->
+              <div class="map-floating-hud">
+                <div class="map-hud-box">
+                  <strong>Capa Geoespacial:</strong>
+                  <select id="map-layer-selector" class="form-control" style="padding:0.28rem 0.6rem; font-size:0.78rem; width:auto; background:#091611; color:#fff;">
+                    <option value="esri_sat">🛰️ Esri World Imagery (Satélite HD)</option>
+                    <option value="google_hybrid">🌍 Google Satellite Hybrid (Calles + Satélite)</option>
+                    <option value="osm">🗺️ OpenStreetMap Catastral</option>
+                    <option value="topo">⛰️ Topográfico Curvas de Nivel</option>
+                  </select>
+                </div>
+
+                <div class="map-hud-box">
+                  <span>Filtro:</span>
+                  <select id="map-status-filter" class="form-control" style="padding:0.28rem 0.6rem; font-size:0.78rem; width:auto; background:#091611; color:#fff;">
+                    <option value="todos">Todos los 38 Lotes (600 m²)</option>
+                    <option value="disponible">Solo Disponibles</option>
+                    <option value="reservado">Solo Reservados</option>
+                    <option value="vendido">Solo Vendidos</option>
+                  </select>
+                  <button id="btn-map-center" class="btn btn-gold btn-sm">Centrar Loteo</button>
+                </div>
+              </div>
+
+              <!-- Contenedor Leaflet / Google Maps -->
+              <div id="geospatial-map"></div>
+
+              <!-- Leyenda Inferior -->
+              <div class="map-legend-bar">
+                <div class="legend-item">
+                  <span class="legend-swatch" style="background:#10b981;"></span>
+                  <span>Disponible (<strong id="map-count-disp">0</strong>)</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-swatch" style="background:#f59e0b;"></span>
+                  <span>Reservado (<strong id="map-count-res">0</strong>)</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-swatch" style="background:#e11d48;"></span>
+                  <span>Vendido (<strong id="map-count-vend">0</strong>)</span>
+                </div>
+                <div class="legend-item mono" style="color:var(--gold-light);">
+                  <span>Polígonos a Escala Real: 20.00m × 30.00m = 600.00 m²</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel Inspector Lateral del Lote Seleccionado en el Mapa -->
+            <aside class="map-inspector-panel" id="map-lot-inspector">
+              <!-- Renderizado dinámicamente al seleccionar un polígono en el mapa -->
+            </aside>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA 3: ESTUDIO RENDER 3D DE CASA Y LOTE 20x30m (THREE.JS)
+             ================================================================ -->
+        <section id="view-studio-3d" class="admin-view hidden">
+          <div class="studio-3d-layout">
+            <!-- Viewport WebGL Three.js -->
+            <div class="canvas-3d-wrapper">
+              <div id="threejs-canvas-container"></div>
+
+              <!-- HUD Superior sobre el Render 3D -->
+              <div class="studio-hud-top">
+                <div class="studio-badge-overlay">
+                  <div class="mono" style="font-size:0.74rem; color:var(--gold-light);">
+                    TERRENO ACOTADO A ESCALA REAL: 20.00m FRENTE × 30.00m FONDO (600.00 m²)
+                  </div>
+                  <h3 id="studio-3d-lot-title" class="serif" style="font-size:1.45rem; margin:0.15rem 0;">
+                    Lote MA-L01 · Villa Terranova 3D
+                  </h3>
+                  <div id="studio-3d-budget-summary" class="mono" style="font-size:0.82rem; color:#6ee7b7;">
+                    Lote: $159.000.000 + Construcción 3D: $285.000.000 = Total: $444.000.000
+                  </div>
+                </div>
+
+                <div class="studio-badge-overlay" style="display:flex; gap:0.5rem; align-items:center;">
+                  <button id="btn-3d-toggle-dimensions" class="btn btn-outline-light btn-sm">
+                    📏 Cotas 20×30m: ON
+                  </button>
+                  <button id="btn-3d-Autorotate" class="btn btn-outline-light btn-sm">
+                    🔄 Giro 360°
+                  </button>
+                  <button id="btn-3d-screenshot" class="btn btn-gold btn-sm">
+                    📸 Capturar Render PNG
+                  </button>
+                </div>
+              </div>
+
+              <!-- HUD Inferior de Cámaras -->
+              <div class="studio-hud-bottom">
+                <div class="camera-presets-bar">
+                  <button class="btn btn-outline-light btn-sm" data-cam="perspective">Vista Aérea 3/4</button>
+                  <button class="btn btn-outline-light btn-sm" data-cam="front">Fachada de Cristal (20m)</button>
+                  <button class="btn btn-outline-light btn-sm" data-cam="interior">🛋️ Vista Interior / Terraza Cristal</button>
+                  <button class="btn btn-outline-light btn-sm" data-cam="pool">🏊 Piscina Infinita & Lounge</button>
+                  <button class="btn btn-outline-light btn-sm" data-cam="top">Planta Arquitectónica 20×30m</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Configuración Arquitectónica 3D -->
+            <aside class="studio-controls-sidebar">
+              <div class="panel-header" style="margin-bottom:0.9rem;">
+                <h3 class="panel-title">Configurador Casa de Cristal 3D</h3>
+                <span class="mono" style="font-size:0.75rem; color:var(--gold-primary);">ArchViz PBR</span>
+              </div>
+
+              <div class="form-group">
+                <label for="studio-select-lot">1. Seleccionar Lote (38 Lotes de 600 m²)</label>
+                <select id="studio-select-lot" class="form-control"></select>
+              </div>
+
+              <div class="form-group">
+                <label for="studio-select-model">2. Prototipo Casa Moderna de Cristal</label>
+                <select id="studio-select-model" class="form-control">
+                  <option value="villa_terranova_1p">Glass Pavilion 1 Piso (85% Cristal · 145 m² · $285M)</option>
+                  <option value="residencia_imperial_2p">Residencia Crystal Imperial 2 Pisos (240 m² · $420M)</option>
+                  <option value="ecolodge_minimalista">Sky-Loft Doble Altura en Cristal (185 m² · $340M)</option>
+                  <option value="solo_terreno_600m2">Solo Lote Campestre Acotado (20×30m = 600 m²)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="studio-select-glass">3. Tipo de Cristal Arquitectónico (Muros Cortina)</label>
+                <select id="studio-select-glass" class="form-control">
+                  <option value="#cceeff">💎 Cristal Ultra-Claro Starphire (Alta Transparencia)</option>
+                  <option value="#7dd3fc">🌊 Cristal Azul Zafiro Reflectivo (Control Solar)</option>
+                  <option value="#d6b892">🥂 Cristal Bronce Champagne (Cálido Arquitectónico)</option>
+                  <option value="#94a3b8">🕶️ Cristal Gris Grafito Ahumado (Privacidad)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>3. Acabado de Fachada Arquitectónica</label>
+                <div class="color-swatch-row" id="facade-color-swatches">
+                  <button type="button" class="color-swatch-btn active" data-color="#F4F1EA" style="background:#F4F1EA;" title="Blanco Marfil Calizo"></button>
+                  <button type="button" class="color-swatch-btn" data-color="#E5DEC9" style="background:#E5DEC9;" title="Arena Travertino"></button>
+                  <button type="button" class="color-swatch-btn" data-color="#D7CCC8" style="background:#D7CCC8;" title="Tierra Cálida"></button>
+                  <button type="button" class="color-swatch-btn" data-color="#CFD8DC" style="background:#CFD8DC;" title="Concreto Arquitectónico"></button>
+                  <button type="button" class="color-swatch-btn" data-color="#455A64" style="background:#455A64;" title="Grafito Pizarra"></button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>4. Color de Cubierta / Techo</label>
+                <div class="color-swatch-row" id="roof-color-swatches">
+                  <button type="button" class="color-swatch-btn active" data-roof="#263238" style="background:#263238;" title="Pizarra Negra"></button>
+                  <button type="button" class="color-swatch-btn" data-roof="#5D4037" style="background:#5D4037;" title="Teja Terracota Oscura"></button>
+                  <button type="button" class="color-swatch-btn" data-roof="#8D4E2A" style="background:#8D4E2A;" title="Arcilla Tradicional"></button>
+                  <button type="button" class="color-swatch-btn" data-roof="#1E3A2F" style="background:#1E3A2F;" title="Cubierta Ecológica Verde"></button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>5. Amenidades Exteriores en los 600 m²</label>
+                <div class="toggle-checks-grid">
+                  <label class="toggle-check-card">
+                    <input type="checkbox" id="chk-3d-pool" checked />
+                    <span>🏊 Piscina & Deck</span>
+                  </label>
+                  <label class="toggle-check-card">
+                    <input type="checkbox" id="chk-3d-pergola" checked />
+                    <span>🪵 Pérgola BBQ</span>
+                  </label>
+                  <label class="toggle-check-card">
+                    <input type="checkbox" id="chk-3d-garage" checked />
+                    <span>🚗 Garaje & SUV</span>
+                  </label>
+                  <label class="toggle-check-card">
+                    <input type="checkbox" id="chk-3d-solar" />
+                    <span>☀️ Paneles Solares</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="slider-sun-hour">
+                  6. Iluminación Solar / Hora del Día: <strong id="lbl-sun-hour" class="mono">15:30 PM</strong>
+                </label>
+                <input type="range" id="slider-sun-hour" min="6" max="22" step="0.5" value="15.5" style="width:100%;" />
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted-light);">
+                  <span>🌅 06:00 AM</span>
+                  <span>☀️ 12:00 PM</span>
+                  <span>🌇 18:00 PM</span>
+                  <span>🌙 22:00 Noche</span>
+                </div>
+              </div>
+
+              <div style="background:var(--bg-alabaster); border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:0.9rem; margin:1rem 0;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.3rem;">
+                  <span>Valor Lote (600 m²):</span>
+                  <strong class="mono" id="calc-3d-lot-price">$150.000.000</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.3rem;">
+                  <span>Obra Casa 3D + Extras:</span>
+                  <strong class="mono" id="calc-3d-house-price">$285.000.000</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.92rem; padding-top:0.4rem; border-top:1px solid var(--border-light); color:var(--gold-primary);">
+                  <strong>Proyecto Llave en Mano:</strong>
+                  <strong class="mono" id="calc-3d-total-price">$435.000.000</strong>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:0.55rem;">
+                <button id="btn-save-3d-mysql" class="btn btn-gold" style="width:100%;">
+                  💾 Guardar Diseño 3D en este Lote (MySQL)
+                </button>
+                <button id="btn-sell-with-3d" class="btn btn-emerald" style="width:100%;">
+                  📋 Cotizar / Vender Lote con esta Casa 3D
+                </button>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA 4: CATÁLOGO Y REGISTRO DETALLADO DE LOS 38 LOTES
+             ================================================================ -->
+        <section id="view-lots-registry" class="admin-view hidden">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3 class="panel-title">Inventario Maestro de los 38 Lotes (20m × 30m = 600.00 m²)</h3>
+                <p style="font-size:0.82rem; color:var(--text-muted-light);">
+                  Registro individual de linderos, matrícula inmobiliaria, propietario, estado de cartera y modelo 3D.
+                </p>
+              </div>
+
+              <div style="display:flex; gap:0.65rem; flex-wrap:wrap;">
+                <input type="text" id="registry-search-input" class="form-control" placeholder="Buscar código, manzana o cliente..." style="width:240px;" />
+                <select id="registry-manzana-filter" class="form-control" style="width:150px;">
+                  <option value="todas">Todas las Manzanas</option>
+                  <option value="Manzana A">Manzana A (L01-L10)</option>
+                  <option value="Manzana B">Manzana B (L11-L20)</option>
+                  <option value="Manzana C">Manzana C (L21-L29)</option>
+                  <option value="Manzana D">Manzana D (L30-L38)</option>
+                </select>
+                <select id="registry-estado-filter" class="form-control" style="width:150px;">
+                  <option value="todos">Todos los Estados</option>
+                  <option value="disponible">Disponibles</option>
+                  <option value="reservado">Reservados</option>
+                  <option value="vendido">Vendidos</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Manzana</th>
+                    <th>Medidas & Área</th>
+                    <th>Precio m²</th>
+                    <th>Valor Lote</th>
+                    <th>Estado</th>
+                    <th>Comprador / Contrato</th>
+                    <th>Abonado / Saldo</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="table-lots-registry"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA 5: MÓDULO DE CONTABILIDAD, VENTAS, CARTERA Y ABONOS
+             ================================================================ -->
+        <section id="view-accounting" class="admin-view hidden">
+          <div class="subtabs-nav">
+            <button class="subtab-btn active" data-subtab="subtab-libro-diario">📒 Libro Diario (Ingresos y Egresos)</button>
+            <button class="subtab-btn" data-subtab="subtab-contratos-ventas">📑 Contratos de Venta y Cartera</button>
+            <button class="subtab-btn" data-subtab="subtab-historial-abonos">🧾 Recibos de Caja y Abonos</button>
+          </div>
+
+          <!-- SUBTAB 1: LIBRO DIARIO DE INGRESOS Y EGRESOS -->
+          <div id="subtab-libro-diario" class="accounting-subtab">
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Libro Mayor de Ingresos y Egresos del Proyecto</h3>
+                  <p style="font-size:0.82rem; color:var(--text-muted-light);">
+                    Contabilidad centralizada en MySQL: recaudos de ventas/cuotas vs costos de urbanismo, vías, redes y comisiones.
+                  </p>
+                </div>
+                <div style="display:flex; gap:0.65rem;">
+                  <select id="accounting-type-filter" class="form-control" style="width:160px;">
+                    <option value="TODOS">Ingresos + Egresos</option>
+                    <option value="INGRESO">Solo Ingresos</option>
+                    <option value="EGRESO">Solo Egresos</option>
+                  </select>
+                  <button class="btn btn-gold btn-sm" onclick="window.app.openNewAccountingModal()">
+                    + Nuevo Asiento Contable
+                  </button>
+                </div>
+              </div>
+
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Asiento</th>
+                      <th>Fecha</th>
+                      <th>Tipo</th>
+                      <th>Categoría</th>
+                      <th>Lote</th>
+                      <th>Tercero / Proveedor</th>
+                      <th>Concepto</th>
+                      <th>Comprobante</th>
+                      <th>Monto</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-accounting-ledger"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBTAB 2: CONTRATOS DE VENTA Y CARTERA -->
+          <div id="subtab-contratos-ventas" class="accounting-subtab hidden">
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Contratos de Adjudicación y Estado de Cartera</h3>
+                  <p style="font-size:0.82rem; color:var(--text-muted-light);">
+                    Control de ventas de contado, financiadas y separaciones sobre los 38 lotes.
+                  </p>
+                </div>
+                <button class="btn btn-gold btn-sm" onclick="window.app.openNewSaleModal()">
+                  + Nueva Venta / Adjudicación
+                </button>
+              </div>
+
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Contrato</th>
+                      <th>Fecha</th>
+                      <th>Lote (600 m²)</th>
+                      <th>Comprador</th>
+                      <th>Modalidad</th>
+                      <th>Proyecto / Casa 3D</th>
+                      <th>Valor Total</th>
+                      <th>Total Abonado</th>
+                      <th>Saldo Pendiente</th>
+                      <th>Cuota Mensual</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-ventas-list"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBTAB 3: HISTORIAL DE ABONOS Y RECIBOS DE CAJA -->
+          <div id="subtab-historial-abonos" class="accounting-subtab hidden">
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Historial de Abonos y Recibos de Caja</h3>
+                  <p style="font-size:0.82rem; color:var(--text-muted-light);">
+                    Trazabilidad de cada pago realizado, saldo anterior, monto abonado y nuevo saldo pendiente.
+                  </p>
+                </div>
+                <button class="btn btn-emerald btn-sm" onclick="window.app.openNewAbonoModal()">
+                  + Registrar Nuevo Abono
+                </button>
+              </div>
+
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Recibo #</th>
+                      <th>Fecha</th>
+                      <th>Contrato</th>
+                      <th>Lote</th>
+                      <th>Cliente</th>
+                      <th>Cuota #</th>
+                      <th>Saldo Anterior</th>
+                      <th>Monto Abonado</th>
+                      <th>Nuevo Saldo</th>
+                      <th>Método</th>
+                      <th>Recibo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-abonos-list"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA 6: DIRECTORIO DE CLIENTES Y PROPIETARIOS
+             ================================================================ -->
+        <section id="view-clients" class="admin-view hidden">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3 class="panel-title">Directorio de Clientes, Compradores e Inversionistas</h3>
+                <p style="font-size:0.82rem; color:var(--text-muted-light);">
+                  Propietarios vinculados a los lotes de Prados de Terranova y resumen de su inversión.
+                </p>
+              </div>
+              <button class="btn btn-gold btn-sm" id="btn-open-new-client">
+                + Registrar Cliente
+              </button>
+            </div>
+
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre / Razón Social</th>
+                    <th>Documento / NIT</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Ciudad</th>
+                    <th>Lotes Adquiridos</th>
+                    <th>Inversión Total</th>
+                    <th>Saldo por Pagar</th>
+                  </tr>
+                </thead>
+                <tbody id="table-clients-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       4. MODALES OPERATIVOS (EXPEDIENTE LOTE, VENTA, ABONO, CONTABILIDAD)
+       ======================================================================== -->
+
+  <!-- MODAL: EXPEDIENTE INTEGRAL DEL LOTE -->
+  <div id="modal-lot-dossier" class="modal-backdrop hidden">
+    <div class="admin-modal-card" style="max-width: 860px;">
+      <button class="modal-close-btn" style="color:var(--text-ink);" onclick="window.app.closeModal('modal-lot-dossier')">✕</button>
+      <div id="lot-dossier-content"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR NUEVA VENTA / ADJUDICACIÓN DE LOTE -->
+  <div id="modal-new-sale" class="modal-backdrop hidden">
+    <div class="admin-modal-card">
+      <button class="modal-close-btn" style="color:var(--text-ink);" onclick="window.app.closeModal('modal-new-sale')">✕</button>
+      <h3 class="serif" style="font-size:1.65rem; margin-bottom:0.25rem;">Adjudicar / Vender Lote Campestre (600 m²)</h3>
+      <p style="font-size:0.82rem; color:var(--text-muted-light); margin-bottom:1.25rem;">
+        Registra el contrato en MySQL, actualiza el estado del lote en el mapa geoespacial y genera el asiento contable.
+      </p>
+
+      <form id="form-new-sale">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Lote a Adjudicar (20m × 30m = 600 m²)</label>
+            <select id="sale-lote-id" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label>Modalidad de Negocio</label>
+            <select id="sale-modalidad" class="form-control" required>
+              <option value="financiado">Financiación Directa (Cuotas)</option>
+              <option value="contado">Pago de Contado (100%)</option>
+              <option value="reserva">Separación / Reserva de Lote</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Seleccionar Cliente Existente</label>
+            <select id="sale-cliente-id" class="form-control">
+              <option value="">-- O registrar nuevo comprador abajo --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Incluir Construcción de Casa Render 3D</label>
+            <select id="sale-modelo-casa" class="form-control">
+              <option value="0|Solo Lote 600m² (20x30m)">Solo Terreno 600 m² ($0 construcción)</option>
+              <option value="285000000|Villa Terranova 1 Piso (145m²)">+ Villa Terranova 1 Piso ($285.000.000)</option>
+              <option value="420000000|Residencia Imperial 2 Pisos (240m²)">+ Residencia Imperial 2 Pisos ($420.000.000)</option>
+              <option value="340000000|Eco-Lodge Minimalista (185m²)">+ Eco-Lodge Minimalista ($340.000.000)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Datos de nuevo cliente opcional -->
+        <div id="new-client-inline-box" style="background:var(--bg-alabaster); padding:0.9rem; border-radius:var(--radius-sm); border:1px solid var(--border-light); margin-bottom:1rem;">
+          <strong style="font-size:0.8rem; display:block; margin-bottom:0.5rem;">Datos del Nuevo Comprador (si no está en la lista superior):</strong>
+          <div class="form-grid-3">
+            <input type="text" id="sale-new-cli-nombre" class="form-control" placeholder="Nombre completo" />
+            <input type="text" id="sale-new-cli-doc" class="form-control" placeholder="Cédula / NIT" />
+            <input type="text" id="sale-new-cli-tel" class="form-control" placeholder="Teléfono / WhatsApp" />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>Valor Lote (COP)</label>
+            <input type="number" id="sale-valor-lote" class="form-control mono" required />
+          </div>
+          <div class="form-group">
+            <label>Descuento Comercial (COP)</label>
+            <input type="number" id="sale-descuento" class="form-control mono" value="0" />
+          </div>
+          <div class="form-group">
+            <label>Cuota Inicial / Pago Hoy (COP)</label>
+            <input type="number" id="sale-cuota-inicial" class="form-control mono" required />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>Plazo Financiación (Meses)</label>
+            <input type="number" id="sale-numero-cuotas" class="form-control mono" value="18" min="1" max="60" />
+          </div>
+          <div class="form-group">
+            <label>Fecha de Próximo Pago</label>
+            <input type="date" id="sale-proximo-pago" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label>Método de Pago Inicial</label>
+            <select id="sale-metodo-pago" class="form-control">
+              <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+              <option value="Cheque Gerencia">Cheque de Gerencia</option>
+              <option value="PSE">PSE</option>
+              <option value="Consignación">Consignación</option>
+              <option value="Efectivo">Efectivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Observaciones del Contrato / Acuerdos Especiales</label>
+          <input type="text" id="sale-observaciones" class="form-control" placeholder="Ej: Incluye acometida de agua y diseño 3D aprobado..." />
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1rem;">
+          <button type="button" class="btn btn-outline-dark" onclick="window.app.closeModal('modal-new-sale')">Cancelar</button>
+          <button type="submit" class="btn btn-gold">Guardar Contrato y Contabilizar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR NUEVO ABONO / CUOTA -->
+  <div id="modal-new-abono" class="modal-backdrop hidden">
+    <div class="admin-modal-card" style="max-width: 580px;">
+      <button class="modal-close-btn" style="color:var(--text-ink);" onclick="window.app.closeModal('modal-new-abono')">✕</button>
+      <h3 class="serif" style="font-size:1.65rem; margin-bottom:0.25rem;">Registrar Abono / Recibo de Caja</h3>
+      <p style="font-size:0.82rem; color:var(--text-muted-light); margin-bottom:1.2rem;">
+        Descuenta automáticamente del saldo pendiente del lote y asienta el ingreso en contabilidad.
+      </p>
+
+      <form id="form-new-abono">
+        <div class="form-group">
+          <label>Contrato / Lote con Saldo Pendiente</label>
+          <select id="abono-venta-id" class="form-control" required></select>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Monto a Abonar (COP)</label>
+            <input type="number" id="abono-monto" class="form-control mono" required />
+          </div>
+          <div class="form-group">
+            <label>Método de Pago</label>
+            <select id="abono-metodo" class="form-control">
+              <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+              <option value="PSE">PSE</option>
+              <option value="Consignación">Consignación</option>
+              <option value="Efectivo">Efectivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Fecha del Abono</label>
+            <input type="date" id="abono-fecha" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label>Siguiente Fecha de Pago</label>
+            <input type="date" id="abono-proximo-pago" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Concepto del Recibo</label>
+          <input type="text" id="abono-concepto" class="form-control" placeholder="Abono cuota mensual de lote campestre..." />
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1rem;">
+          <button type="button" class="btn btn-outline-dark" onclick="window.app.closeModal('modal-new-abono')">Cancelar</button>
+          <button type="submit" class="btn btn-emerald">Emitir Recibo de Caja</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR MOVIMIENTO CONTABLE (INGRESO / EGRESO) -->
+  <div id="modal-new-accounting" class="modal-backdrop hidden">
+    <div class="admin-modal-card" style="max-width: 620px;">
+      <button class="modal-close-btn" style="color:var(--text-ink);" onclick="window.app.closeModal('modal-new-accounting')">✕</button>
+      <h3 class="serif" style="font-size:1.65rem; margin-bottom:0.25rem;">Nuevo Asiento Contable (Libro Diario)</h3>
+      <p style="font-size:0.82rem; color:var(--text-muted-light); margin-bottom:1.2rem;">
+        Registra gastos de urbanismo, vías, topografía, comisiones o ingresos adicionales del proyecto.
+      </p>
+
+      <form id="form-new-accounting">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Tipo de Movimiento</label>
+            <select id="acc-tipo" class="form-control" required>
+              <option value="EGRESO">🔴 EGRESO (Gasto / Costo Proyecto)</option>
+              <option value="INGRESO">🟢 INGRESO (Entrada de Caja)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Categoría Contable</label>
+            <select id="acc-categoria" class="form-control" required>
+              <option value="URBANISMO_VIAS">Urbanismo y Vías Internas</option>
+              <option value="RED_ELECTRICA_ACUEDUCTO">Red Eléctrica y Acueducto</option>
+              <option value="TOPOGRAFIA_LICENCIAS">Topografía y Licencias</option>
+              <option value="COMISIONES_VENTAS">Comisiones de Ventas</option>
+              <option value="MANTENIMIENTO_PORTERIA">Portería y Paisajismo</option>
+              <option value="MARKETING_PUBLICIDAD">Marketing y Publicidad</option>
+              <option value="GASTOS_LEGALES_NOTARIA">Gastos Legales / Notaría</option>
+              <option value="CONSTRUCCION_CASA_3D">Construcción Casa 3D</option>
+              <option value="VENTA_INICIAL">Ingreso Venta / Inicial</option>
+              <option value="ABONO_CARTERA">Ingreso Abono Cartera</option>
+              <option value="OTROS">Otros Movimientos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Tercero / Proveedor / Beneficiario</label>
+            <input type="text" id="acc-tercero" class="form-control" placeholder="Ej: Maquinaria & Vías S.A.S." required />
+          </div>
+          <div class="form-group">
+            <label>NIT / Documento Tercero</label>
+            <input type="text" id="acc-doc-tercero" class="form-control" placeholder="900.123.456-1" />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>Monto Total (COP)</label>
+            <input type="number" id="acc-monto" class="form-control mono" required />
+          </div>
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" id="acc-fecha" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label>Lote Asociado (Opcional)</label>
+            <select id="acc-lote-id" class="form-control">
+              <option value="">General del Proyecto</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Concepto Detallado</label>
+          <input type="text" id="acc-concepto" class="form-control" placeholder="Descripción de la factura o movimiento..." required />
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1rem;">
+          <button type="button" class="btn btn-outline-dark" onclick="window.app.closeModal('modal-new-accounting')">Cancelar</button>
+          <button type="submit" class="btn btn-gold">Guardar Asiento en MySQL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVO CLIENTE -->
+  <div id="modal-new-client" class="modal-backdrop hidden">
+    <div class="admin-modal-card" style="max-width: 540px;">
+      <button class="modal-close-btn" style="color:var(--text-ink);" onclick="window.app.closeModal('modal-new-client')">✕</button>
+      <h3 class="serif" style="font-size:1.6rem; margin-bottom:1rem;">Registrar Nuevo Cliente / Inversionista</h3>
+      <form id="form-new-client">
+        <div class="form-group">
+          <label>Nombre Completo o Razón Social</label>
+          <input type="text" id="cli-nombre" class="form-control" required />
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Documento / NIT</label>
+            <input type="text" id="cli-documento" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label>Teléfono Móvil</label>
+            <input type="text" id="cli-telefono" class="form-control" required />
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" id="cli-correo" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label>Ciudad</label>
+            <input type="text" id="cli-ciudad" class="form-control" value="Bogotá D.C." />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ocupación / Actividad</label>
+          <input type="text" id="cli-ocupacion" class="form-control" placeholder="Empresario / Inversionista..." />
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1rem;">
+          <button type="button" class="btn btn-outline-dark" onclick="window.app.closeModal('modal-new-client')">Cancelar</button>
+          <button type="submit" class="btn btn-gold">Guardar Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenedor de Notificaciones Toast -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ========================================================================
+       LIBRERÍAS EXTERNAS (ANIME.JS, LEAFLET, THREE.JS + ORBITCONTROLS)
+       ======================================================================== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- MÓDULOS DE LA APLICACIÓN -->
+  <script src="/js/landing-anime.js"></script>
+  <script src="/js/map-viewer.js"></script>
+  <script src="/js/house-3d.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
