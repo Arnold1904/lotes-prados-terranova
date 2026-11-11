@@ -3,16 +3,19 @@ import { useProgress } from '@react-three/drei';
 import { useStore } from '../store';
 
 export default function Loader() {
-  const { active, progress } = useProgress();
+  const { active, progress, errors } = useProgress();
   const loaded = useStore((s) => s.loaded);
   const setLoaded = useStore((s) => s.setLoaded);
 
   useEffect(() => {
-    if (!active && progress >= 99) {
+    if (!active && (progress >= 99 || errors.length > 0)) {
       const t = setTimeout(() => setLoaded(true), 400);
       return () => clearTimeout(t);
     }
-  }, [active, progress, setLoaded]);
+    // Respaldo de seguridad para que nunca se quede congelada la pantalla de carga
+    const fallback = setTimeout(() => setLoaded(true), 7000);
+    return () => clearTimeout(fallback);
+  }, [active, progress, errors.length, setLoaded]);
 
   return (
     <div className={`loader ${loaded ? 'done' : ''}`}>

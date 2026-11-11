@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Component, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Experience from './three/Experience';
@@ -17,6 +17,24 @@ import { useStore, useHouse } from './store';
 import { HOUSES, FACADE_MATERIALS } from './data/houses';
 
 gsap.registerPlugin(ScrollTrigger);
+
+class SceneErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(err) {
+    console.warn('Error cargando escena 3D:', err);
+    useStore.getState().setLoaded(true);
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
 
 function ExploreHud() {
   const mode = useStore((s) => s.mode);
@@ -137,7 +155,9 @@ export default function App() {
     <>
       <Loader />
       <div className="canvas-stage" aria-hidden="true">
-        <Experience />
+        <SceneErrorBoundary>
+          <Experience />
+        </SceneErrorBoundary>
       </div>
       <div className={`scene-curtain ${fading ? 'show' : ''}`} />
       <Navbar />
