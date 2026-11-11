@@ -1,8 +1,18 @@
 import { create } from 'zustand';
 import { HOUSES, HOUSE_BY_ID } from './data/houses';
-import { DEFAULT_LOTEO_CONFIG } from './utils/lotGeometry';
+import {
+  computeLoteoGeometry,
+  DEFAULT_LOTEO_CONFIG,
+  INITIAL_SOLD_LOTS,
+} from './utils/lotGeometry';
 
 const defaultFacades = Object.fromEntries(HOUSES.map((h) => [h.id, h.defaultFacade]));
+
+const initialGeo = computeLoteoGeometry(DEFAULT_LOTEO_CONFIG, []);
+const initialLots = initialGeo.lots.map((l) => ({
+  ...l,
+  estado: INITIAL_SOLD_LOTS.has(Number(l.numero_lote)) ? 'vendido' : 'disponible',
+}));
 
 const savedAuth = (() => {
   try {
@@ -32,9 +42,9 @@ export const useStore = create((set, get) => ({
   adminTab: 'compra', // 'compra' | 'cartera' | 'satelital' | 'clientes'
 
   // Estado de lotes satelitales (Prados de Terranova - MySQL)
-  lotes: [],
-  loteoConfig: DEFAULT_LOTEO_CONFIG,
-  loteoOverlays: null,
+  lotes: initialLots,
+  loteoConfig: initialGeo.config,
+  loteoOverlays: initialGeo.overlays,
   selectedLotNumero: 1,
   loadingLotes: false,
 
