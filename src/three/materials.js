@@ -1,61 +1,121 @@
 import * as THREE from 'three';
-import { useTexture } from '@react-three/drei';
 
-// key -> [carpeta Poly Haven, tamaño del tile en metros, props extra]
+const CACHE_BUST = 'v=3';
+
+// key -> [carpeta Poly Haven, tamaño del tile en metros, color base inicial, props extra]
 const PBR = {
-  concrete: ['brushed_concrete', 3, { color: '#d9d6d0' }],
-  plaster: ['white_plaster_02', 2.5, { color: '#f4f1ea' }],
-  whiteBrick: ['white_bricks', 1.6, {}],
-  redBrick: ['brick_wall_001', 2, {}],
-  stone: ['stone_wall', 2.5, {}],
-  stackedStone: ['stacked_stone_wall', 2, {}],
-  woodClad: ['brown_planks_07', 2.2, {}],
-  darkWood: ['dark_wooden_planks', 2.2, {}],
-  roofGrey: ['grey_roof_tiles', 2, {}],
-  roofClay: ['clay_roof_tiles', 2, {}],
-  roofSlate: ['roof_slates_02', 2, { color: '#8f8f8f' }],
-  deck: ['wood_floor_deck', 2.5, {}],
-  woodFloor: ['wood_floor', 2.5, {}],
-  pavers: ['concrete_pavers', 2.5, {}],
-  grass: ['leafy_grass', 3.5, { color: '#c8d4b0' }],
-  forest: ['forest_ground_04', 4, {}],
-  gravel: ['gravel', 2, {}],
-  poolTile: ['blue_floor_tiles_01', 1.2, { emissive: '#2fb7d6', emissiveIntensity: 0 }],
-  metal: ['metal_plate', 1, { metalness: 0.8, color: '#9a9a9a' }],
+  concrete: ['brushed_concrete', 3, '#d9d6d0', { color: '#d9d6d0', roughness: 0.85 }],
+  plaster: ['white_plaster_02', 2.5, '#f4f1ea', { color: '#f4f1ea', roughness: 0.78 }],
+  whiteBrick: ['white_bricks', 1.6, '#ece8e0', { roughness: 0.82 }],
+  redBrick: ['brick_wall_001', 2, '#a85a42', { roughness: 0.85 }],
+  stone: ['stone_wall', 2.5, '#8c877e', { roughness: 0.88 }],
+  stackedStone: ['stacked_stone_wall', 2, '#7d776d', { roughness: 0.9 }],
+  woodClad: ['brown_planks_07', 2.2, '#9e6b43', { roughness: 0.75 }],
+  darkWood: ['dark_wooden_planks', 2.2, '#4a3525', { roughness: 0.75 }],
+  roofGrey: ['grey_roof_tiles', 2, '#4a4d50', { roughness: 0.8 }],
+  roofClay: ['clay_roof_tiles', 2, '#b55d3d', { roughness: 0.8 }],
+  roofSlate: ['roof_slates_02', 2, '#6f7275', { color: '#8f8f8f', roughness: 0.78 }],
+  deck: ['wood_floor_deck', 2.5, '#8c5e3c', { roughness: 0.76 }],
+  woodFloor: ['wood_floor', 2.5, '#a67853', { roughness: 0.7 }],
+  pavers: ['concrete_pavers', 2.5, '#9e9b95', { roughness: 0.85 }],
+  grass: ['leafy_grass', 3.5, '#6e854c', { color: '#c8d4b0', roughness: 0.95 }],
+  forest: ['forest_ground_04', 4, '#5c6b43', { roughness: 0.95 }],
+  gravel: ['gravel', 2, '#8c8982', { roughness: 0.92 }],
+  poolTile: ['blue_floor_tiles_01', 1.2, '#2fb7d6', { emissive: '#2fb7d6', emissiveIntensity: 0, roughness: 0.35 }],
+  metal: ['metal_plate', 1, '#9a9a9a', { metalness: 0.8, roughness: 0.35, color: '#9a9a9a' }],
 };
-
-const PATHS = {};
-for (const [key, [dir]] of Object.entries(PBR)) {
-  PATHS[`${key}_diff`] = `/textures/${dir}/diff.jpg`;
-  PATHS[`${key}_nor`] = `/textures/${dir}/nor.jpg`;
-  PATHS[`${key}_rough`] = `/textures/${dir}/rough.jpg`;
-  PATHS[`${key}_ao`] = `/textures/${dir}/ao.jpg`;
-}
 
 let MATS = null;
 
-function build(tex) {
+function configureTex(t, tile, isColor) {
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(1 / tile, 1 / tile);
+  t.anisotropy = 8;
+  t.colorSpace = isColor ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+  t.needsUpdate = true;
+}
+
+function build() {
   const m = {};
-  for (const [key, [, tile, extra]] of Object.entries(PBR)) {
-    const maps = ['diff', 'nor', 'rough', 'ao'].map((s) => tex[`${key}_${s}`]);
-    maps.forEach((t, i) => {
-      t.wrapS = t.wrapT = THREE.RepeatWrapping;
-      t.repeat.set(1 / tile, 1 / tile);
-      t.anisotropy = 8;
-      t.colorSpace = i === 0 ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-      t.needsUpdate = true;
-    });
-    m[key] = new THREE.MeshStandardMaterial({
-      map: maps[0],
-      normalMap: maps[1],
-      roughnessMap: maps[2],
-      aoMap: maps[3],
-      aoMapIntensity: 1,
-      roughness: 1,
+  const loader = new THREE.TextureLoader();
+
+  for (const [key, [dir, tile, baseColor, extra]] of Object.entries(PBR)) {
+    const mat = new THREE.MeshStandardMaterial({
+      color: baseColor,
+      roughness: 0.85,
       metalness: 0,
       ...extra,
     });
-    m[key].name = key;
+    mat.name = key;
+    m[key] = mat;
+
+    // Carga asíncrona no bloqueante de cada mapa PBR
+    loader.load(
+      `/textures/${dir}/diff.jpg?${CACHE_BUST}`,
+      (t) => {
+        configureTex(t, tile, true);
+        mat.map = t;
+        mat.color.set(extra.color || '#ffffff');
+        mat.needsUpdate = true;
+        if (key === 'plaster') {
+          if (m.slab) {
+            m.slab.map = t;
+            m.slab.needsUpdate = true;
+          }
+          if (m.interiorWall) {
+            m.interiorWall.map = t;
+            m.interiorWall.needsUpdate = true;
+          }
+        }
+      },
+      undefined,
+      () => {}
+    );
+
+    loader.load(
+      `/textures/${dir}/nor.jpg?${CACHE_BUST}`,
+      (t) => {
+        configureTex(t, tile, false);
+        mat.normalMap = t;
+        mat.needsUpdate = true;
+        if (key === 'plaster') {
+          if (m.slab) {
+            m.slab.normalMap = t;
+            m.slab.needsUpdate = true;
+          }
+          if (m.interiorWall) {
+            m.interiorWall.normalMap = t;
+            m.interiorWall.needsUpdate = true;
+          }
+        }
+      },
+      undefined,
+      () => {}
+    );
+
+    loader.load(
+      `/textures/${dir}/rough.jpg?${CACHE_BUST}`,
+      (t) => {
+        configureTex(t, tile, false);
+        mat.roughnessMap = t;
+        mat.roughness = 1;
+        mat.needsUpdate = true;
+      },
+      undefined,
+      () => {}
+    );
+
+    loader.load(
+      `/textures/${dir}/ao.jpg?${CACHE_BUST}`,
+      (t) => {
+        configureTex(t, tile, false);
+        mat.aoMap = t;
+        mat.aoMapIntensity = 1;
+        mat.needsUpdate = true;
+      },
+      undefined,
+      () => {}
+    );
   }
 
   // Losas y aleros (estuco más blanco)
@@ -117,12 +177,14 @@ function build(tex) {
 }
 
 export function useMaterials() {
-  const tex = useTexture(PATHS);
-  if (!MATS) MATS = build(tex);
+  if (!MATS) MATS = build();
   return MATS;
 }
 
-export const getMaterials = () => MATS;
+export const getMaterials = () => {
+  if (!MATS) MATS = build();
+  return MATS;
+};
 
 // ---------- Geometrías con UV en metros (texturas sin estirar y continuas) ----------
 const boxCache = new Map();
@@ -147,8 +209,7 @@ export function worldBox(w, h, d, ox = 0, oy = 0, oz = 0) {
     else uv.setXY(i, x, y);
   }
   uv.needsUpdate = true;
-  boxCache.set(key, g);
-  return g;
+  return (boxCache.set(key, g), g);
 }
 
 export function worldPlane(w, h) {

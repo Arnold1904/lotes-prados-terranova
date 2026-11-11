@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { Component, Suspense, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
@@ -129,9 +129,22 @@ export function NightLight({ intensity = 25, distance = 14, color = '#ffbe7a', p
   return <pointLight ref={ref} color={color} distance={distance} decay={2} intensity={0} position={position} />;
 }
 
-/** Modelo GLB (Poly Haven) clonado con sombras. */
-export function Model({ id, ...props }) {
-  const { scene } = useGLTF(`/models/${id}.glb`);
+class ModelErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
+function LoadedModel({ id, ...props }) {
+  const { scene } = useGLTF(`/models/${id}.glb?v=3`);
   const clone = useMemo(() => {
     const c = scene.clone(true);
     c.traverse((o) => {
@@ -146,12 +159,22 @@ export function Model({ id, ...props }) {
   return <primitive object={clone} {...props} />;
 }
 
+/** Modelo GLB (Poly Haven) clonado con sombras, aislado en su propio Suspense/ErrorBoundary. */
+export function Model({ id, ...props }) {
+  return (
+    <ModelErrorBoundary>
+      <Suspense fallback={null}>
+        <LoadedModel id={id} {...props} />
+      </Suspense>
+    </ModelErrorBoundary>
+  );
+}
+
 export const MODEL_IDS = [
   'jacaranda_tree', 'island_tree_02', 'pine_tree_01', 'fir_tree_01', 'shrub_01', 'shrub_02', 'shrub_04',
   'potted_plant_01', 'potted_plant_02', 'sofa_03', 'modern_coffee_table_01', 'mid_century_lounge_chair',
   'outdoor_table_chair_set_01', 'boulder_01', 'street_lamp_02',
 ];
-MODEL_IDS.forEach((id) => useGLTF.preload(`/models/${id}.glb`));
 
 /** Terreno circular con huecos rectangulares (p.ej. piscina). holes: [[x0, z0, x1, z1]] */
 export function Ground({ mat, radius = 260, holes = [] }) {
