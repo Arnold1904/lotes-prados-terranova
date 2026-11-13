@@ -238,7 +238,7 @@ export async function initDatabase() {
       road_internal_m DECIMAL(6,2) NOT NULL DEFAULT 9.00,
       road_main_m DECIMAL(6,2) NOT NULL DEFAULT 9.00,
       perimeter_pad_m DECIMAL(6,2) NOT NULL DEFAULT 8.00,
-      default_precio_m2 DECIMAL(14,2) NOT NULL DEFAULT 250000.00,
+      default_precio_m2 DECIMAL(14,2) NOT NULL DEFAULT 150000.00,
       updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `);
@@ -258,7 +258,7 @@ export async function initDatabase() {
     await pool.query(
       `INSERT INTO configuracion_loteo
         (id, nombre_proyecto, ubicacion_texto, center_lat, center_lng, rotation_deg, default_front_m, default_depth_m, gap_lotes_m, road_internal_m, road_main_m, perimeter_pad_m, default_precio_m2)
-       VALUES (1, ?, ?, ?, ?, ?, 20, 30, 0, 9, 9, 8, 250000)`,
+       VALUES (1, ?, ?, ?, ?, ?, 20, 30, 0, 9, 9, 8, 150000)`,
       [
         process.env.VITE_PROJECT_NAME || 'Condominio Campestre Prados de Terranova',
         process.env.VITE_PROJECT_LOCATION || 'Kilómetro 7 vía Yopal - Aguazul margen derecha, a 300 metros de la vía principal',
@@ -297,7 +297,7 @@ export async function initDatabase() {
           estado, topografia, orientacion, servicios_agua, servicios_energia, servicios_fibra,
           via_acceso, lindero_norte, lindero_sur, lindero_oriente, lindero_occidente,
           matricula_inmobiliaria, latitud, longitud, coordenadas_geojson, render_config, descripcion
-        ) VALUES (?, ?, ?, ?, ?, ?, 250000, ?, ?, 'Plano', 'Norte-Sur', 1, 1, 1, 'Vía interna 9m', ?, ?, ?, ?, '', ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Plano', 'Norte-Sur', 1, 1, 1, 'Vía interna 9m', ?, ?, ?, ?, '', ?, ?, ?, ?, ?)`,
         [
           lot.numero_lote,
           lot.codigo,
@@ -305,6 +305,7 @@ export async function initDatabase() {
           lot.frente_m,
           lot.fondo_m,
           lot.area_m2,
+          lot.precio_m2,
           lot.precio_total,
           estado,
           lot.lindero_norte,
@@ -324,6 +325,36 @@ export async function initDatabase() {
   // Sincronizar configuración y geometría de los 38 lotes con el diseño oficial de Prados de Terranova
   const [[currentCfg]] = await pool.query('SELECT * FROM configuracion_loteo WHERE id = 1');
   const [lotes] = await pool.query('SELECT * FROM lotes ORDER BY numero_lote ASC');
+
+  // Actualizar los estados (V / R) y precios según las directrices oficiales
+  // Lotes 1, 2, 3: $80.000.000 COP. Lotes 4-38: $90.000.000 COP
+  const [activeSales] = await pool.query(
+    "SELECT lote_id, modalidad FROM ventas WHERE estado != 'cancelada'"
+  );
+  const saleByLotId = new Map();
+  for (const s of activeSales) {
+    saleByLotId.set(Number(s.lote_id), s.modalidad);
+  }
+
+  for (const l of lotes) {
+    const num = Number(l.numero_lote);
+    let nuevoEstado = INITIAL_SOLD_LOTS.has(num) ? 'vendido' : 'disponible';
+    if (saleByLotId.has(Number(l.id))) {
+      nuevoEstado = saleByLotId.get(Number(l.id)) === 'reserva' ? 'reservado' : 'vendido';
+    }
+
+    const precioObjetivo = num <= 3 ? 80000000 : (Number(l.precio_total) === 150000000 || !l.precio_total ? 90000000 : Number(l.precio_total));
+    const precioM2Objetivo = Number((precioObjetivo / 600).toFixed(2));
+
+    await pool.query(
+      `UPDATE lotes
+       SET estado = ?,
+           precio_total = ?,
+           precio_m2 = ?
+       WHERE id = ?`,
+      [nuevoEstado, precioObjetivo, precioM2Objetivo, l.id]
+    );
+  }
 
   const needsMasterPlanSync =
     !currentCfg ||

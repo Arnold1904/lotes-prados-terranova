@@ -207,7 +207,7 @@ export function createApiRouter() {
           Number(road_internal_m),
           Number(road_main_m),
           Number(perimeter_pad_m),
-          Number(default_precio_m2 || 250000),
+          Number(default_precio_m2 || 150000),
         ]
       );
 
@@ -230,12 +230,25 @@ export function createApiRouter() {
         if (resetIndividualOffsets) {
           parsedGeo.customOffset = { dx: 0, dy: 0 };
         }
+
+        const num = Number(lot.numero_lote);
+        // Si se pide actualizar precios: si el lote es 1, 2 o 3, preservar 80M a menos que se especifique
+        let precio_m2 = Number(lot.precio_m2);
+        let precio_total = Number(lot.precio_total);
+        if (updateAvailablePrices && lot.estado === 'disponible') {
+          if (num <= 3) {
+            precio_total = 80000000;
+            precio_m2 = Number((80000000 / 600).toFixed(2));
+          } else {
+            precio_m2 = Number(default_precio_m2 || lot.precio_m2 || 150000);
+            precio_total = Number((600 * precio_m2).toFixed(2));
+          }
+        }
+
         return {
           ...lot,
-          precio_m2:
-            updateAvailablePrices && lot.estado === 'disponible'
-              ? Number(default_precio_m2 || lot.precio_m2)
-              : Number(lot.precio_m2),
+          precio_m2,
+          precio_total,
           coordenadas_geojson: parsedGeo,
         };
       });
@@ -403,23 +416,25 @@ export function createApiRouter() {
       if (!dbAvailable) {
         const vendidos = INITIAL_SOLD_LOTS.size;
         const disponibles = 38 - vendidos;
+        // Lotes 1, 2, 3 en 80M, resto en 90M
+        const valorInventario = 3 * 80000000 + 35 * 90000000;
         return res.json({
           lotes: {
             total_lotes: 38,
             disponibles,
             reservados: 0,
             vendidos,
-            valor_inventario_total: 38 * 150000000,
-            valor_disponible: disponibles * 150000000,
+            valor_inventario_total: valorInventario,
+            valor_disponible: disponibles * 90000000,
           },
           ventas: {
             total_contratos: vendidos,
-            total_vendido: vendidos * 150000000,
-            total_recaudado: vendidos * 150000000,
+            total_vendido: vendidos * 90000000,
+            total_recaudado: vendidos * 90000000,
             cartera_pendiente: 0,
           },
           contabilidad: {
-            total_ingresos: vendidos * 150000000,
+            total_ingresos: vendidos * 90000000,
             total_egresos: 0,
           },
           total_clientes: vendidos,
@@ -802,7 +817,7 @@ export function createApiRouter() {
       const { venta_id } = req.query;
       let sql = `
         SELECT a.*, v.codigo_contrato, l.codigo AS lote_codigo, l.numero_lote,
-               c.nombre AS cliente_nombre, c.documento AS cliente_documento
+               c.nombre AS cliente_nombre, c.documento AS cliente_documento, c.telefono AS cliente_telefono
         FROM abonos a
         JOIN ventas v ON v.id = a.venta_id
         JOIN lotes l ON l.id = a.lote_id
@@ -934,9 +949,16 @@ export function createApiRouter() {
 
       await conn.commit();
 
-      const [[nuevoAbono]] = await pool.query('SELECT * FROM abonos WHERE id = ?', [
-        abonoRes.insertId,
-      ]);
+      const [[nuevoAbono]] = await pool.query(
+        `SELECT a.*, v.codigo_contrato, l.codigo AS lote_codigo, l.numero_lote,
+                c.nombre AS cliente_nombre, c.documento AS cliente_documento, c.telefono AS cliente_telefono
+         FROM abonos a
+         JOIN ventas v ON v.id = a.venta_id
+         JOIN lotes l ON l.id = a.lote_id
+         JOIN clientes c ON c.id = v.cliente_id
+         WHERE a.id = ?`,
+        [abonoRes.insertId]
+      );
 
       res.status(201).json({
         message: `Abono registrado. Nuevo saldo pendiente: $${nuevoSaldo.toLocaleString('es-CO')}`,

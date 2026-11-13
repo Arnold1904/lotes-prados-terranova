@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '../store';
 import { formatCOP, HOUSES } from '../data/houses';
 import { computeLoteoGeometry } from '../utils/lotGeometry';
+import { generateAmortizationSchedule } from '../utils/finance';
 import SatelliteMapCanvas from './SatelliteMapCanvas';
+import ReceiptModal from './ReceiptModal';
 
 export default function AdminPortal() {
   const user = useStore((s) => s.user);
@@ -25,6 +27,7 @@ export default function AdminPortal() {
   const [contabilidad, setContabilidad] = useState([]);
   const [toast, setToast] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [activeReceiptModal, setActiveReceiptModal] = useState(null);
 
   // Estados para ocultar información secundaria y mostrar solo lo importante
   const [showMoreCliente, setShowMoreCliente] = useState(false);
@@ -54,9 +57,9 @@ export default function AdminPortal() {
     modelo_casa: 'Villa Solaris',
     valor_casa_3d: 280000000,
     descuento: 0,
-    cuota_inicial: 30000000,
-    numero_cuotas: 36,
-    tasa_interes_mensual: 0,
+    cuota_inicial: 27000000, // 30% de 90M
+    numero_cuotas: 36, // Entre 24 y 58 meses
+    tasa_interes_mensual: 2.0, // Tasa sugerida del Excel, 100% editable
     metodo_pago_inicial: 'Transferencia Bancaria',
     referencia_pago_inicial: '',
     asesor_comercial: 'Administración Terranova',
@@ -175,9 +178,9 @@ export default function AdminPortal() {
     return computeLoteoGeometry(draftConfig, previewLots);
   }, [draftConfig, lotes, selectedLotNumero, lotEditForm]);
 
-  // Cálculos del proceso de compra y tabla de amortización
+  // Cálculos del proceso de compra y tabla de amortización basada en el modelo de Excel
   const financialSummary = useMemo(() => {
-    const valLote = Number(activeLot?.precio_total || 150000000);
+    const valLote = Number(activeLot?.precio_total || (Number(activeLot?.numero_lote) <= 3 ? 80000000 : 90000000));
     const valCasa = ventaForm.incluye_casa_3d ? Number(ventaForm.valor_casa_3d || 0) : 0;
     const desc = Number(ventaForm.descuento || 0);
     const totalVenta = Math.max(0, valLote + valCasa - desc);
@@ -189,37 +192,12 @@ export default function AdminPortal() {
     const tasa =
       ventaForm.modalidad === 'contado' ? 0 : Number(ventaForm.tasa_interes_mensual || 0);
 
-    let cuotaMensual = 0;
-    if (saldoFinanciar > 0) {
-      if (tasa > 0) {
-        const r = tasa / 100;
-        cuotaMensual =
-          (saldoFinanciar * (r * Math.pow(1 + r, cuotas))) / (Math.pow(1 + r, cuotas) - 1);
-      } else {
-        cuotaMensual = saldoFinanciar / cuotas;
-      }
-    }
-
-    // Generar cronograma de amortización (primeras 12 o todas las cuotas)
-    const schedule = [];
-    let balance = saldoFinanciar;
-    const baseDate = new Date((ventaForm.fecha_venta || new Date().toISOString().slice(0, 10)) + 'T12:00:00');
-
-    for (let i = 1; i <= cuotas && balance > 0; i++) {
-      const d = new Date(baseDate);
-      d.setMonth(d.getMonth() + i);
-      const interest = tasa > 0 ? balance * (tasa / 100) : 0;
-      const principal = Math.min(balance, cuotaMensual - interest);
-      balance = Math.max(0, balance - principal);
-      schedule.push({
-        cuota: i,
-        fecha: d.toISOString().slice(0, 10),
-        valorCuota: Math.round(cuotaMensual),
-        capital: Math.round(principal),
-        interes: Math.round(interest),
-        saldo: Math.round(balance),
-      });
-    }
+    const amort = generateAmortizationSchedule({
+      montoFinanciar: saldoFinanciar,
+      plazoMeses: cuotas,
+      tasaInteresMensualPct: tasa,
+      fechaInicio: ventaForm.fecha_venta || new Date().toISOString().slice(0, 10),
+    });
 
     return {
       valLote,
@@ -230,8 +208,10 @@ export default function AdminPortal() {
       saldoFinanciar,
       cuotas,
       tasa,
-      cuotaMensual: Math.round(cuotaMensual),
-      schedule,
+      cuotaMensual: amort.cuotaFija,
+      totalIntereses: amort.totalIntereses,
+      costoTotalFinanciado: amort.costoTotalFinanciado,
+      schedule: amort.cronograma,
     };
   }, [activeLot, ventaForm]);
 
@@ -292,6 +272,9 @@ export default function AdminPortal() {
       if (!res.ok) throw new Error(data.error || 'Error registrando abono');
 
       showNotice(data.message);
+      if (data.abono) {
+        setActiveReceiptModal(data.abono);
+      }
       setAbonoForm({
         ...abonoForm,
         monto: '',
@@ -624,27 +607,46 @@ export default function AdminPortal() {
                   {ventaForm.modalidad !== 'contado' && (
                     <>
                       <label>
-                        <span>Cuota Inicial (COP)</span>
+                        <span>Cuota Inicial (Mínimo 30%: {formatCOP(Math.round(financialSummary.totalVenta * 0.3))})</span>
                         <input
                           type="number"
-                          min="0"
+                          min={Math.round(financialSummary.totalVenta * 0.3)}
                           step="any"
                           value={ventaForm.cuota_inicial}
                           onChange={(e) =>
                             setVentaForm({ ...ventaForm, cuota_inicial: Number(e.target.value) })
                           }
+                          required
                         />
                       </label>
 
                       <label>
-                        <span>Plazo (Meses)</span>
+                        <span>Plazo (24 a 58 Meses)</span>
                         <input
                           type="number"
-                          min="1"
-                          max="120"
+                          min="24"
+                          max="58"
                           value={ventaForm.numero_cuotas}
                           onChange={(e) =>
                             setVentaForm({ ...ventaForm, numero_cuotas: Number(e.target.value) })
+                          }
+                          required
+                        />
+                      </label>
+
+                      <label>
+                        <span>Interés Mensual (%) [Editable]</span>
+                        <input
+                          type="number"
+                          min="0"
+                          max="10"
+                          step="0.1"
+                          value={ventaForm.tasa_interes_mensual}
+                          onChange={(e) =>
+                            setVentaForm({
+                              ...ventaForm,
+                              tasa_interes_mensual: Number(e.target.value),
+                            })
                           }
                         />
                       </label>
@@ -821,15 +823,23 @@ export default function AdminPortal() {
                   <strong className="gold">{formatCOP(financialSummary.totalVenta)}</strong>
                 </div>
                 <div className="fin-line">
-                  <span>Cuota Inicial:</span>
+                  <span>Cuota Inicial ({((financialSummary.inicial / (financialSummary.totalVenta || 1)) * 100).toFixed(0)}%):</span>
                   <strong className="text-green">{formatCOP(financialSummary.inicial)}</strong>
                 </div>
                 <div className="fin-line">
-                  <span>Saldo a Financiar:</span>
+                  <span>Monto Neto a Financiar:</span>
                   <strong className="text-amber">{formatCOP(financialSummary.saldoFinanciar)}</strong>
                 </div>
+                <div className="fin-line">
+                  <span>Total Intereses ({financialSummary.tasa}% mes):</span>
+                  <strong>{formatCOP(financialSummary.totalIntereses)}</strong>
+                </div>
+                <div className="fin-line">
+                  <span>Costo Total Proyecto:</span>
+                  <strong>{formatCOP(financialSummary.costoTotalFinanciado + financialSummary.inicial)}</strong>
+                </div>
                 <div className="fin-line highlight">
-                  <span>Cuota Mensual ({financialSummary.cuotas} meses):</span>
+                  <span>Cuota Fija Mensual ({financialSummary.cuotas} meses):</span>
                   <strong className="gold">{formatCOP(financialSummary.cuotaMensual)} / mes</strong>
                 </div>
               </div>
@@ -842,27 +852,37 @@ export default function AdminPortal() {
                 >
                   {showAmortTable
                     ? '▲ Ocultar cronograma de cuotas'
-                    : `▼ Ver cronograma de amortización (${financialSummary.schedule.length} cuotas)`}
+                    : `▼ Ver tabla de amortización tipo Excel (${financialSummary.schedule.length} meses)`}
                 </button>
 
                 {showAmortTable && (
-                  <div className="amort-table-wrap" style={{ marginTop: '0.6rem' }}>
+                  <div className="amort-table-wrap" style={{ marginTop: '0.6rem', maxHeight: '340px' }}>
                     <table className="admin-table">
                       <thead>
                         <tr>
-                          <th>#</th>
-                          <th>Fecha</th>
-                          <th>Cuota</th>
-                          <th>Saldo</th>
+                          <th>Mes</th>
+                          <th>Saldo Inicial</th>
+                          <th>Cuota Fija</th>
+                          <th>Interés ({financialSummary.tasa}%)</th>
+                          <th>Abono Capital</th>
+                          <th>Saldo Final</th>
+                          <th>Estado</th>
                         </tr>
                       </thead>
                       <tbody>
                         {financialSummary.schedule.map((row) => (
-                          <tr key={row.cuota}>
-                            <td>{row.cuota}</td>
-                            <td>{row.fecha}</td>
-                            <td>{formatCOP(row.valorCuota)}</td>
-                            <td>{formatCOP(row.saldo)}</td>
+                          <tr key={row.mes}>
+                            <td><strong>Mes {row.mes}</strong></td>
+                            <td>{formatCOP(row.saldoInicial)}</td>
+                            <td className="gold">{formatCOP(row.cuotaMensual)}</td>
+                            <td>{formatCOP(row.interes)}</td>
+                            <td>{formatCOP(row.abonoCapital)}</td>
+                            <td>{formatCOP(row.saldoFinal)}</td>
+                            <td>
+                              <span className={`status-pill ${row.estado === 'PAGADO' ? 'disp' : 'vend'}`}>
+                                {row.estado}
+                              </span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -1045,16 +1065,27 @@ export default function AdminPortal() {
                         <th>Cliente</th>
                         <th>Monto</th>
                         <th>Saldo</th>
+                        <th>Acción</th>
                       </tr>
                     </thead>
                     <tbody>
                       {abonos.map((a) => (
                         <tr key={a.id}>
-                          <td>{a.codigo_recibo}</td>
+                          <td><strong>{a.codigo_recibo}</strong></td>
                           <td>{a.lote_codigo}</td>
                           <td>{a.cliente_nombre}</td>
                           <td className="text-green">{formatCOP(a.monto)}</td>
                           <td>{formatCOP(a.nuevo_saldo)}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn-print-action"
+                              style={{ padding: '3px 8px', fontSize: '0.74rem' }}
+                              onClick={() => setActiveReceiptModal(a)}
+                            >
+                              🖨️ Ver Recibo
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1232,11 +1263,11 @@ export default function AdminPortal() {
                           />
                         </label>
                         <label>
-                          <span>Precio m² (COP)</span>
+                          <span>Precio Base m² (COP) [600m² = {formatCOP(600 * (draftConfig.default_precio_m2 || 150000))}]</span>
                           <input
                             type="number"
                             step="any"
-                            value={draftConfig.default_precio_m2 || 250000}
+                            value={draftConfig.default_precio_m2 || 150000}
                             onChange={(e) =>
                               setDraftConfig({
                                 ...draftConfig,
@@ -1479,6 +1510,14 @@ export default function AdminPortal() {
           </div>
         )}
       </div>
+
+      {/* Modal de Recibo Oficial Imprimible */}
+      {activeReceiptModal && (
+        <ReceiptModal
+          abono={activeReceiptModal}
+          onClose={() => setActiveReceiptModal(null)}
+        />
+      )}
     </div>
   );
 }

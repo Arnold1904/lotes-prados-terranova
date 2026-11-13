@@ -12,11 +12,21 @@ export const DEFAULT_LOTEO_CONFIG = {
   road_internal_m: 9,
   road_main_m: 9,
   perimeter_pad_m: 8,
-  default_precio_m2: 250000,
+  default_precio_m2: 150000, // $150.000/m² -> 600m² = $90.000.000 COP valor base
 };
 
-// Lotes marcados con X en el cuadro físico oficial de Prados de Terranova
-export const INITIAL_SOLD_LOTS = new Set([2, 5, 10, 16, 19, 20, 21, 25, 28, 29, 37, 38]);
+// Lotes marcados como apartados o vendidos (R - Rojo)
+// Exactamente: 2, 5, 16, 19, 20, 21, 23, 24, 25, 27, 28, 29, 37, 38 (14 lotes)
+// Los demás son Disponibles (V - Verde): 24 lotes
+export const INITIAL_SOLD_LOTS = new Set([2, 5, 16, 19, 20, 21, 23, 24, 25, 27, 28, 29, 37, 38]);
+
+// Precios especiales iniciales por lote
+// Lotes 1, 2 y 3 tienen un valor especial de $80.000.000 COP
+export const SPECIAL_LOT_PRICES = {
+  1: 80000000,
+  2: 80000000,
+  3: 80000000,
+};
 
 // Definición de sectores / manzanas para filtros y códigos
 export const ROWS_DEFINITION = [
@@ -381,8 +391,20 @@ export function computeLoteoGeometry(config = {}, existingLots = []) {
     const front = customSize && existing.frente_m ? Number(existing.frente_m) : cfg.default_front_m;
     const depth = customSize && existing.fondo_m ? Number(existing.fondo_m) : cfg.default_depth_m;
     const area = Number((front * depth).toFixed(2));
-    const precio_m2 = Number(existing.precio_m2 || cfg.default_precio_m2 || 250000);
-    const precio_total = Number((area * precio_m2).toFixed(2));
+    
+    // Determinación del precio total y precio por m2
+    let precio_total;
+    let precio_m2;
+    if (existing.precio_total && Number(existing.precio_total) > 0) {
+      precio_total = Number(existing.precio_total);
+      precio_m2 = area > 0 ? Number((precio_total / area).toFixed(2)) : Number(existing.precio_m2 || cfg.default_precio_m2 || 150000);
+    } else if (SPECIAL_LOT_PRICES[numero_lote]) {
+      precio_total = SPECIAL_LOT_PRICES[numero_lote];
+      precio_m2 = area > 0 ? Number((precio_total / area).toFixed(2)) : Number(cfg.default_precio_m2 || 150000);
+    } else {
+      precio_m2 = Number(existing.precio_m2 || cfg.default_precio_m2 || 150000);
+      precio_total = Number((area * precio_m2).toFixed(2));
+    }
 
     const dx = Number(customOffset.dx || 0);
     const dy = Number(customOffset.dy || 0);

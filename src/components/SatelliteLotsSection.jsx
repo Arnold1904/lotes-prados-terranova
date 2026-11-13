@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import { formatCOP, PROJECT_INFO } from '../data/houses';
+import { calculatePMT } from '../utils/finance';
 import SatelliteMapCanvas from './SatelliteMapCanvas';
 
 export default function SatelliteLotsSection() {
@@ -13,9 +14,10 @@ export default function SatelliteLotsSection() {
   const openPurchaseForLot = useStore((s) => s.openPurchaseForLot);
   const user = useStore((s) => s.user);
 
-  // Simulador rápido en la ficha del lote
-  const [cuotaInicialPct, setCuotaInicialPct] = useState(20);
+  // Simulador dinámico en la ficha del lote (Mínimo 30% cuota inicial, plazo 24 a 58 meses, tasa editable sugerida 2.0%)
+  const [cuotaInicialPct, setCuotaInicialPct] = useState(30);
   const [plazoMeses, setPlazoMeses] = useState(36);
+  const [tasaMensualPct, setTasaMensualPct] = useState(2.0);
   const [filterManzana, setFilterManzana] = useState('TODAS');
   const [showLinderos, setShowLinderos] = useState(false);
   const [showQuickGrid, setShowQuickGrid] = useState(false);
@@ -31,10 +33,12 @@ export default function SatelliteLotsSection() {
   const reservadosCount = lotes.filter((l) => l.estado === 'reservado').length;
   const vendidosCount = lotes.filter((l) => l.estado === 'vendido').length;
 
-  const precioTotal = Number(activeLot?.precio_total || 150000000);
-  const cuotaInicialVal = Math.round((precioTotal * cuotaInicialPct) / 100);
+  const precioTotal = Number(activeLot?.precio_total || (Number(activeLot?.numero_lote) <= 3 ? 80000000 : 90000000));
+  const cuotaInicialVal = Math.round((precioTotal * Math.max(30, cuotaInicialPct)) / 100);
   const saldoFinanciar = Math.max(0, precioTotal - cuotaInicialVal);
-  const cuotaMensual = plazoMeses > 0 ? Math.round(saldoFinanciar / plazoMeses) : 0;
+  const cuotaMensual = Math.round(
+    calculatePMT((Number(tasaMensualPct) || 0) / 100, plazoMeses, saldoFinanciar)
+  );
 
   const filteredLots =
     filterManzana === 'TODAS'
@@ -184,22 +188,22 @@ export default function SatelliteLotsSection() {
                   <strong>{PROJECT_INFO.phoneDisplay}</strong>
                 </div>
 
-                {/* Simulador rápido de financiación */}
+                {/* Simulador dinámico de financiación basado en Excel */}
                 <div className="lot-sim-box">
                   <div className="sim-title-row">
-                    <h4>Financiación Directa</h4>
-                    <span className="sim-tag">0% Interés</span>
+                    <h4>Simulador Dinámico de Financiación</h4>
+                    <span className="sim-tag">Amortización a Cuota Fija</span>
                   </div>
 
                   <div className="sim-control">
                     <div className="sim-label">
-                      <span>Inicial ({cuotaInicialPct}%)</span>
+                      <span>Cuota Inicial (Mínimo 30%: {cuotaInicialPct}%)</span>
                       <strong>{formatCOP(cuotaInicialVal)}</strong>
                     </div>
                     <input
                       type="range"
-                      min="10"
-                      max="70"
+                      min="30"
+                      max="75"
                       step="5"
                       value={cuotaInicialPct}
                       onChange={(e) => setCuotaInicialPct(Number(e.target.value))}
@@ -207,8 +211,11 @@ export default function SatelliteLotsSection() {
                   </div>
 
                   <div className="sim-control">
+                    <div className="sim-label">
+                      <span>Plazo: <strong>{plazoMeses} meses</strong> (Entre 24 y 58 meses)</span>
+                    </div>
                     <div className="sim-term-pills">
-                      {[12, 24, 36, 48, 60].map((m) => (
+                      {[24, 30, 36, 42, 48, 54, 58].map((m) => (
                         <button
                           key={m}
                           type="button"
@@ -221,11 +228,41 @@ export default function SatelliteLotsSection() {
                     </div>
                   </div>
 
+                  <div className="sim-control">
+                    <div className="sim-label" style={{ marginBottom: '0.35rem' }}>
+                      <span>Tasa de Interés Mensual:</span>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                        <input
+                          type="number"
+                          min="0"
+                          max="5"
+                          step="0.1"
+                          value={tasaMensualPct}
+                          onChange={(e) => setTasaMensualPct(Number(e.target.value))}
+                          style={{
+                            width: '65px',
+                            padding: '3px 6px',
+                            fontSize: '0.82rem',
+                            borderRadius: '4px',
+                            border: '1px solid rgba(212,175,55,0.4)',
+                            background: 'rgba(0,0,0,0.5)',
+                            color: '#fff',
+                            textAlign: 'right',
+                          }}
+                        />
+                        <span style={{ fontSize: '0.8rem', color: '#ccc' }}>% mes</span>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="sim-result">
                     <div>
-                      <span>Cuota mensual ({plazoMeses} meses):</span>
+                      <span>Cuota fija mensual ({plazoMeses} meses):</span>
                       <strong className="gold">{formatCOP(cuotaMensual)} / mes</strong>
                     </div>
+                    <small style={{ color: '#aaa', fontSize: '0.74rem', marginTop: '3px', display: 'block' }}>
+                      Saldo a financiar: {formatCOP(saldoFinanciar)} · Cuota calculada según fórmula PMT oficial
+                    </small>
                   </div>
                 </div>
 

@@ -6,8 +6,8 @@ export default function LoginModal() {
   const setLoginModalOpen = useStore((s) => s.setLoginModalOpen);
   const setAuth = useStore((s) => s.setAuth);
 
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -63,7 +63,7 @@ export default function LoginModal() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin o admin@localhost"
+              placeholder="Usuario o correo electrónico"
               required
             />
           </label>
@@ -80,12 +80,6 @@ export default function LoginModal() {
           </label>
 
           {error && <div className="login-error">{error}</div>}
-
-          <div className="login-hint-box">
-            <small>
-              Credenciales MySQL (`prados_terranova.usuarios`): Usuario <strong>admin</strong> · Contraseña <strong>admin123</strong>
-            </small>
-          </div>
 
           <button type="submit" className="btn-primary full" disabled={loading}>
             {loading ? 'Verificando en MySQL...' : 'Ingresar al Panel de Control'}
